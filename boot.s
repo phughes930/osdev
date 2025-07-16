@@ -63,7 +63,7 @@ _start:
 	stack (as it grows downwards on x86 systems). This is necessarily done
 	in assembly as languages such as C cannot function without a stack.
 	*/
-	movl %esp, $stack_top
+	movl $stack_top, %esp
 
 	/*
 	This is a good place to initialize crucial processor state before the
@@ -75,12 +75,57 @@ _start:
 	C++ features such as global constructors and exceptions will require
 	runtime support to work as well.
 	*/
+gdtr:   .long 0
+        .word 0x17
+
+    /* disable interrupts */
+    cli
+
+    /* load gdtr pointer into the gdt register */
+    lgdt gdtr
+
     /* define null value and set to first GDT value */
-    movl %eax, 0
-    shl $31, %eax
-    movl (%esp), %eax
+    xor %eax, %eax
+    pushl %eax
+    pushl %eax
 
+    /* define code segment descriptor */
+    andl $0xFFFF, %eax
+    pushl %eax
+    xor %eax, %eax
+    movb $0xCF, %al
+    sal $4, %eax
+    and $0x9A00, %eax
+    pushl %eax
+    xor %eax, %eax
 
+    /* define data segment descriptor */
+    andl $0xFFFF, %eax
+    pushl %eax
+    xor %eax, %eax
+    movb $0xCF, %al
+    sal $4, %eax
+    and $0x9200, %eax
+    pushl %eax
+
+    /* set segment registers */
+    push $0x08
+    leal (reload_cs), %eax
+    pushl %eax
+    retfl
+
+reload_cs:
+    xor %eax, %eax
+    movw $0x10, %ax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+
+    /* preserve alignment to 16-byte alignment */
+    xor %eax, %eax
+    pushl %eax
+    pushl %eax
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte
 	aligned at the time of the call instruction (which afterwards pushes

@@ -78,6 +78,10 @@ _start:
 gdtr:   .long 0
         .word 0x17
 
+gdt_seg:
+    .word   // limit lower 16 bits
+    .word   // base lower 16 bits
+
     /* disable interrupts */
     cli
 

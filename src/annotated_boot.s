@@ -42,6 +42,15 @@ bootloader will jump to this position once the kernel has been loaded. It
 doesn't make sense to return from this function as the bootloader is gone.
 */
 .section .text
+
+.global _set_gdt_high
+.type _set_gdt_high, @function
+_set_gdt_high:
+    movb %dl, 4(seg_high)
+    movl seg_high, %eax
+    pushl %eax
+    ret
+
 .global _start
 .type _start, @function
 _start:
@@ -75,26 +84,42 @@ _start:
 	C++ features such as global constructors and exceptions will require
 	runtime support to work as well.
 	*/
-gdtr:   .long 0
-        .word 0x17
 
-gdt_seg:
-    .word   // limit lower 16 bits
-    .word   // base lower 16 bits
+gdtr:   .word 23            // size
+        .long 0             // linear address of the gdt
+
+seg_low:
+    .word   0xFFFF
+    .word   0
+
+seg_high:
+    .byte   0xFF            // base mid
+    .byte   0               // access byte
+    .byte   0xCF            // limit (low 4) and flags (high 4)
+    .byte   0xFF            // base high
 
     /* disable interrupts */
     cli
-
-    /* load gdtr pointer into the gdt register */
-    lgdt gdtr
 
     /* define null value and set to first GDT value */
     xor %eax, %eax
     pushl %eax
     pushl %eax
 
+    /* load gdtr pointer into the gdt register */
+    leal 8(%esp), %eax
+    movl %eax, (gdtr)
+    lgdt gdtr
+
     /* define code segment descriptor */
-    andl $0xFFFF, %eax
+    xor %eax, %eax
+    movl seg_low, %eax
+    pushl %eax
+    movb $0x9A, 4(seg_high)
+    movl seg_high, %eax
+    pushl %eax
+
+/*
     pushl %eax
     xor %eax, %eax
     movb $0xCF, %al
@@ -102,16 +127,24 @@ gdt_seg:
     and $0x9A00, %eax
     pushl %eax
     xor %eax, %eax
+*/
 
     /* define data segment descriptor */
-    andl $0xFFFF, %eax
+    xor %eax, %eax
+    movl seg_low, %eax
+    pushl %eax
+    movb $0x92, 4(seg_high)
+    movl seg_high, %eax
+    pushl %eax
+
+ /* andl $0xFFFF, %eax
     pushl %eax
     xor %eax, %eax
     movb $0xCF, %al
     sal $4, %eax
     and $0x9200, %eax
     pushl %eax
-
+*/
     /* set segment registers */
     push $0x08
     leal (reload_cs), %eax

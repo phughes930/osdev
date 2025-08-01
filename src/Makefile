@@ -18,7 +18,7 @@ myos.iso: myos.bin
 myos.bin: linker.ld boot.o # kernel.o
 	$(CC) -T $< -o $@ $(LFLAGS) boot.o
 
-boot.o: new_boot.s
+boot.o: boot.s
 	$(AS) $^ -o $@
 
 kernel.o: kernel.c

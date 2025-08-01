@@ -1,1 +1,6 @@
 opt/
+
+*.bin
+*.iso
+/isodir/
+*.o

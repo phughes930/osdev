@@ -2,5 +2,5 @@ opt/
 
 *.bin
 *.iso
-/isodir/
+isodir/
 *.o

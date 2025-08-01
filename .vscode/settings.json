@@ -2,7 +2,4 @@
     "C_Cpp.codeAnalysis.clangTidy.args": [
         "--extra-arg=--target=i386"
     ],
-    "clangd.arguments": [
-        "-target i386"
-    ]
 }

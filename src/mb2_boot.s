@@ -38,6 +38,7 @@ saved_eax: .skip 4
 saved_ebx: .skip 4
 
 .section .text
+.extern term_main
 .global start
 .type start, @function
 start:
@@ -75,6 +76,8 @@ start:
     movl    saved_ebx, %eax
     addl    $12, %edi
     call    print_hex
+
+    call    term_main
 
 halt_loop:
     hlt

@@ -10,9 +10,10 @@ extern unsigned char inportb(unsigned short _port);
 extern void outportb(unsigned short _port, unsigned char _data);
 
 /* KERNEL.C */
-extern void cls();
-extern void terminal_putchar(char c);
-extern void terminal_writestring(const char *data);
-extern void terminal_initialize();
+// extern void cls();
+// extern void terminal_putchar(char c);
+// extern void terminal_writestring(const char *data);
+// extern void terminal_initialize();
+// extern void kernel_main();
 
 #endif

@@ -14,4 +14,4 @@ PatOS.elf: linker.ld mb2_boot.o
 .phony: clean
 
 clean:
-	rm *.o *.elf iso/boot/*.elf
+	rm *.o *.elf iso/boot/*.elf	*.iso

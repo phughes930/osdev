@@ -68,7 +68,7 @@ void term_init() {
     term_y = 0;
     term_color = vga_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 
-    // cls();
+    cls();
 }
 
 void term_putc_at(size_t x, size_t y, uint16_t entry) {
@@ -90,6 +90,19 @@ void term_putchar(char c) {
     }
 }
 
+void term_putstring(char *string, int len) {
+    for (int i = 0; i < len; i++) {
+        term_putchar(string[i]);
+    }
+}
+
 void term_main() {
     term_init();
+    char *welcome_string = "Welcome to PatOS";
+    int welcome_len = mystrlen(welcome_string);
+    term_putstring(welcome_string, welcome_len);
+
+    for (;;) {
+        ;
+    }
 }

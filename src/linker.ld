@@ -1,20 +1,36 @@
 ENTRY(start)
 SECTIONS {
-    . = 2M;
-    .text BLOCK(4K) : ALIGN(4K)
+    . = 0x100000;
+
+    .multiboot : 
     {
         *(.multiboot)
+    }
+
+    . = ALIGN(4);
+
+    .text : 
+    {
         *(.text)
     }
-    .rodata BLOCK(4K) : ALIGN(4K)
+
+    /* PVH Note */
+    .note.Xen :
+    {
+        *(.note.Xen)
+    }
+    
+    .rodata ALIGN(4K) :
     {
         *(.rodata)
     }
-    .data BLOCK(4K) : ALIGN(4K)
+
+    .data ALIGN(4K) :
     {
         *(.data)
     }
-    .bss BLOCK(4K) : ALIGN(4K)
+
+    .bss ALIGN(4K) :
     {
         *(COMMON)
         *(.bss)

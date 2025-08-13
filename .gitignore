@@ -4,3 +4,4 @@ opt/
 *.iso
 isodir/
 *.o
+*.elf

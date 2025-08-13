@@ -40,15 +40,25 @@ gdtr:
     .long   # should be an address
 
 gdt_bottom:
-.skip 32            # 8 bytes x 2 levels x 2 types
+.skip 64    # 8 bytes x 2 levels x 2 types + 8 for null + 8 for TSS
+            # + 16 for extra TSS
 gdt_top:
+
+tss:
+.skip 104
+tss_limit:
 
 
 saved_eax: .skip 4
 saved_ebx: .skip 4
 
 .section .text
+
 .extern term_main
+.extern set_gdtr
+.extern set_gdt_descr
+.extern set_tss_descriptor
+
 .global start
 .type start, @function
 start:
@@ -133,7 +143,9 @@ start:
     incl    %ecx
     movb    $0xCF, %al
     movb    $0x9A, %dl
+    pushl   %ecx
     call    set_gdt_descr
+    popl    %ecx
 
     #   debug the kernel code segment
     movl    $gdt_desc_message, %esi
@@ -149,10 +161,12 @@ start:
     subl    $40, %edi
     
     #   set up a kernel data segment
-    movl    $2, %ecx
+    incl    %ecx
     movb    $0xCF, %al
     movb    $0x92, %dl
+    pushl   %ecx
     call    set_gdt_descr
+    popl    %ecx
 
     #   debug the kernel data segment
     movl    $gdt_desc_message, %esi
@@ -166,6 +180,28 @@ start:
     movl    gdt_bottom+20, %eax
     call    print_hex
     
+    #   set up a user code segment
+    incl    %ecx
+    movb    $0xCF, %al
+    movb    $0xFA, %dl
+    pushl   %ecx
+    call    set_gdt_descr
+    popl    %ecx
+
+    #   set up a user data segment
+    incl    %ecx
+    movb    $0xCF, %al
+    movb    $0xF2, %dl
+    pushl   %ecx
+    call    set_gdt_descr
+    popl    %ecx
+
+    #   set up a task state segment
+    incl    %ecx
+    pushl   %ecx
+    call    set_tss_descriptor
+    popl    %ecx
+
     // call    term_main
 
 halt_loop:
@@ -177,8 +213,6 @@ isrs:
 
 # cls: clear screen
 cls:
-    pushl   %eax
-    pushl   %ecx
     pushl   %edi
 
     xorl    %edi, %edi
@@ -192,15 +226,12 @@ cls_loop:
     loop    cls_loop
     
     popl    %edi
-    popl    %ecx
-    popl    %eax
     ret
 
 # print_string: 
 #   %esi: string pointer
 #   %edi: screen offset
 print_string:
-    pushl   %eax
     pushl   %edi
     pushl   %esi
     
@@ -217,7 +248,6 @@ print_loop:
 print_done:
     popl    %esi
     popl    %edi
-    popl    %eax
     ret
 
 # print_hex:
@@ -275,6 +305,8 @@ set_gdtr:
 set_gdt_descr:
     pushl   %edi
     pushl   %ebx
+    pushl   %ecx
+
     # get memory address for current segment
     movl    $gdt_bottom, %edi
 
@@ -314,9 +346,59 @@ set_null_descr:
     movl    %eax, (%edi)
 
 finish_gdt_seg:
+    popl    %ecx
     popl    %ebx
     popl    %edi
     ret
+
+set_tss_descriptor:
+    pushl   %ebx
+    pushl   %edi
+    pushl   %esi
+    pushl   %ecx
+
+    movl    $gdt_bottom, %edi
+
+    imull   $8, %ecx
+    addl    %ecx, %edi
+
+    # set low four bytes
+    movl    $tss, %ebx
+    movl    $tss_limit, %esi
+    subl    %ebx, %esi
+    subl    $1, %esi
+    sall    $16, %ebx
+    xorw    %bx, %bx
+    orw     %si, %bx
+
+    movl    %ebx, (%edi)
+    addl    $4, %edi
+
+    # set high four bytes
+    #   limit in %esi
+    xorl    %ebx, %ebx
+    movl    $tss, %ebx
+    andl    $0xFF000000, %ebx
+
+    movl    $tss, %edx
+    andl    $0x00FF0000, %edx
+    shrl    $16, %edx
+    orb     %dl, %al
+
+    movb    $0x00, %dh
+    movb    $0x89, %dl
+    shll    $8, %edx
+    andl    $0x00FFFF00, %edx
+    orl     %edx, %ebx
+
+    movl    %ebx, (%edi)
+
+    popl    %ecx
+    popl    %esi
+    popl    %edi
+    popl    %ebx
+    ret
+
 
 .section .rodata
 welcome_message:

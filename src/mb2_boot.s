@@ -58,6 +58,7 @@ saved_ebx: .skip 4
 .extern set_gdtr
 .extern set_gdt_descr
 .extern set_tss_descriptor
+.extern idt_install
 
 .global start
 .type start, @function
@@ -202,7 +203,8 @@ start:
     call    set_tss_descriptor
     popl    %ecx
 
-    // call    term_main
+    call    idt_install
+    call    term_main
 
 halt_loop:
     hlt

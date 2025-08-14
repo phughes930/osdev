@@ -10,10 +10,22 @@ extern unsigned char inportb(unsigned short _port);
 extern void outportb(unsigned short _port, unsigned char _data);
 
 /* KERNEL.C */
-// extern void cls();
-// extern void terminal_putchar(char c);
-// extern void terminal_writestring(const char *data);
-// extern void terminal_initialize();
-// extern void kernel_main();
+extern void cls();
+extern void term_putchar(char c);
+extern void term_putstring(const char *string, int len);
+extern void term_init();
+extern void term_main();
+
+/* IDT.C */
+void idt_set_gate(unsigned char num, unsigned long base, unsigned char flags, unsigned char sel);
+void idt_install();
+
+/* ISRS.C */
+struct regs {
+    unsigned int gs, fs, es, ds;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int int_no, err_no;
+    unsigned int eip, cs, eflags, useresp, ss;
+};
 
 #endif

@@ -1,6 +1,6 @@
 unsigned char *memcpy(unsigned char *dest, const unsigned char *src, int count) {
     unsigned char *dest_cpy = dest;
-    for (int i = 0; i < count; src++, dest_cpy++) {
+    for (int i = 0; i < count; src++, dest_cpy++, i++) {
         *dest_cpy = *src;
     }
     return dest;

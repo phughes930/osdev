@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <system.h>
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -90,7 +91,7 @@ void term_putchar(char c) {
     }
 }
 
-void term_putstring(char *string, int len) {
+void term_putstring(const char *string, int len) {
     for (int i = 0; i < len; i++) {
         term_putchar(string[i]);
     }
@@ -99,7 +100,7 @@ void term_putstring(char *string, int len) {
 void term_main() {
     term_init();
     char *welcome_string = "Welcome to PatOS";
-    int welcome_len = mystrlen(welcome_string);
+    int welcome_len = strlen(welcome_string);
     term_putstring(welcome_string, welcome_len);
 
     for (;;) {

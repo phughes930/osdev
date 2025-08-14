@@ -3,18 +3,21 @@ AS=i686-elf-as
 IDIR=../include
 CFLAGS=-I$(IDIR) -ffreestanding -std=gnu99 -O2 -Wall -Wextra
 
+_DEPS=system.h
+DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
+
 patos.iso: PatOS.elf
 	cp PatOS.elf iso/boot/
 	grub-mkrescue -o patos.iso iso/
 
-PatOS.elf: linker.ld booter.o kernel.o
-	$(CC) -T $< -o $@ booter.o kernel.o -ffreestanding -nostdlib
+PatOS.elf: linker.ld booter.o kernel.o idt.o system.o isrs.o
+	$(CC) -o $@ -T $^ -ffreestanding -nostdlib
 
-booter.o: mb2_boot.s gdt.s
+booter.o: mb2_boot.s gdt.s isr.s
 	$(AS) -o $@ $^
 
-%.o: %.c
-	$(CC) -c -o $@ $^ $(CFLAGS)
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 .phony: clean
 

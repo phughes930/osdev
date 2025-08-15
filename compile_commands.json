@@ -1,7 +1,7 @@
 [
   {
     "arguments": [
-      "/home/pat/opt/cross/bin/i686-elf-gcc",
+      "/home/phughes/osdev/opt/cross/bin/i686-elf-gcc",
       "-c",
       "-I../include",
       "-ffreestanding",
@@ -13,13 +13,13 @@
       "kernel.o",
       "kernel.c"
     ],
-    "directory": "/home/pat/osDev/src",
-    "file": "/home/pat/osDev/src/kernel.c",
-    "output": "/home/pat/osDev/src/kernel.o"
+    "directory": "/home/phughes/osdev/src",
+    "file": "/home/phughes/osdev/src/kernel.c",
+    "output": "/home/phughes/osdev/src/kernel.o"
   },
   {
     "arguments": [
-      "/home/pat/opt/cross/bin/i686-elf-gcc",
+      "/home/phughes/osdev/opt/cross/bin/i686-elf-gcc",
       "-c",
       "-I../include",
       "-ffreestanding",
@@ -31,13 +31,13 @@
       "idt.o",
       "idt.c"
     ],
-    "directory": "/home/pat/osDev/src",
-    "file": "/home/pat/osDev/src/idt.c",
-    "output": "/home/pat/osDev/src/idt.o"
+    "directory": "/home/phughes/osdev/src",
+    "file": "/home/phughes/osdev/src/idt.c",
+    "output": "/home/phughes/osdev/src/idt.o"
   },
   {
     "arguments": [
-      "/home/pat/opt/cross/bin/i686-elf-gcc",
+      "/home/phughes/osdev/opt/cross/bin/i686-elf-gcc",
       "-c",
       "-I../include",
       "-ffreestanding",
@@ -49,8 +49,26 @@
       "system.o",
       "system.c"
     ],
-    "directory": "/home/pat/osDev/src",
-    "file": "/home/pat/osDev/src/system.c",
-    "output": "/home/pat/osDev/src/system.o"
+    "directory": "/home/phughes/osdev/src",
+    "file": "/home/phughes/osdev/src/system.c",
+    "output": "/home/phughes/osdev/src/system.o"
+  },
+  {
+    "arguments": [
+      "/home/phughes/osdev/opt/cross/bin/i686-elf-gcc",
+      "-c",
+      "-I../include",
+      "-ffreestanding",
+      "-std=gnu99",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-o",
+      "isrs.o",
+      "isrs.c"
+    ],
+    "directory": "/home/phughes/osdev/src",
+    "file": "/home/phughes/osdev/src/isrs.c",
+    "output": "/home/phughes/osdev/src/isrs.o"
   }
 ]

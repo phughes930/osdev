@@ -127,19 +127,6 @@ start:
     movl    $0, %ecx
     call    set_gdt_descr
 
-    #   debug the null descriptor
-    movl    $gdt_desc_message, %esi
-    addl    $160, %edi
-    call    print_string
-
-    movl    gdt_bottom, %eax
-    addl    $18, %edi
-    call    print_hex
-    addl    $22, %edi
-    movl    gdt_bottom+4, %eax
-    call    print_hex
-    subl    $40, %edi
-    
     #   set up a kernel code segment
     incl    %ecx
     movb    $0xCF, %al
@@ -148,19 +135,6 @@ start:
     call    set_gdt_descr
     popl    %ecx
 
-    #   debug the kernel code segment
-    movl    $gdt_desc_message, %esi
-    addl    $160, %edi
-    call    print_string
-
-    movl    gdt_bottom+8, %eax
-    addl    $18, %edi
-    call    print_hex
-    addl    $22, %edi
-    movl    gdt_bottom+12, %eax
-    call    print_hex
-    subl    $40, %edi
-    
     #   set up a kernel data segment
     incl    %ecx
     movb    $0xCF, %al
@@ -169,18 +143,6 @@ start:
     call    set_gdt_descr
     popl    %ecx
 
-    #   debug the kernel data segment
-    movl    $gdt_desc_message, %esi
-    addl    $160, %edi
-    call    print_string
-
-    movl    gdt_bottom+16, %eax
-    addl    $18, %edi
-    call    print_hex
-    addl    $22, %edi
-    movl    gdt_bottom+20, %eax
-    call    print_hex
-    
     #   set up a user code segment
     incl    %ecx
     movb    $0xCF, %al
@@ -203,6 +165,44 @@ start:
     call    set_tss_descriptor
     popl    %ecx
 
+    #   debug the null descriptor
+    movl    $gdt_desc_message, %esi
+    addl    $160, %edi
+    call    print_string
+
+    movl    gdt_bottom, %eax
+    addl    $18, %edi
+    call    print_hex
+    addl    $22, %edi
+    movl    gdt_bottom+4, %eax
+    call    print_hex
+    subl    $40, %edi
+    
+    #   debug the kernel code segment
+    movl    $gdt_desc_message, %esi
+    addl    $160, %edi
+    call    print_string
+
+    movl    gdt_bottom+8, %eax
+    addl    $18, %edi
+    call    print_hex
+    addl    $22, %edi
+    movl    gdt_bottom+12, %eax
+    call    print_hex
+    subl    $40, %edi
+    
+    #   debug the kernel data segment
+    movl    $gdt_desc_message, %esi
+    addl    $160, %edi
+    call    print_string
+
+    movl    gdt_bottom+16, %eax
+    addl    $18, %edi
+    call    print_hex
+    addl    $22, %edi
+    movl    gdt_bottom+20, %eax
+    call    print_hex
+    
     call    kernel_main
 
 halt_loop:

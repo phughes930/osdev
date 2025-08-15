@@ -27,5 +27,10 @@ struct regs {
     unsigned int int_no, err_no;
     unsigned int eip, cs, eflags, useresp, ss;
 };
+void isrs_install();
 
+/* IRQS.C */
+void irq_install();
+void irq_install_handler(int irq, void (*handler)(struct regs *r));
+void irq_uninstall_handler(int irq);
 #endif

@@ -203,14 +203,11 @@ start:
     call    set_tss_descriptor
     popl    %ecx
 
-    call    idt_install
-    call    term_main
+    call    kernel_main
 
 halt_loop:
     hlt
     jmp     halt_loop
-
-isrs:
 
 
 # cls: clear screen

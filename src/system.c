@@ -1,3 +1,5 @@
+#include <system.h>
+
 unsigned char *memcpy(unsigned char *dest, const unsigned char *src, int count) {
     unsigned char *dest_cpy = dest;
     for (int i = 0; i < count; src++, dest_cpy++, i++) {
@@ -44,4 +46,21 @@ unsigned char inportb(unsigned short _port) {
  *  cannot be done in C */
 void outportb(unsigned short _port, unsigned char _data) {
     asm volatile("outb %1, %0" : : "dN"(_port), "a"(_data));
+}
+
+void kernel_main() {
+    term_init();
+    char *welcome_string = "Welcome to PatOS";
+    int welcome_len = strlen(welcome_string);
+    term_putstring(welcome_string, welcome_len);
+
+    idt_install();
+    isrs_install();
+    irq_install();
+
+    // asm volatile("sti");
+
+    for (;;) {
+        asm volatile("hlt");
+    }
 }

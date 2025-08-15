@@ -1,7 +1,7 @@
-#include "system.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <system.h>
 
 struct idt_entry {
     unsigned short base_low;

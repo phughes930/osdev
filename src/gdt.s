@@ -50,7 +50,7 @@ set_gdt_descr:
     # access byte
     orb     %dl, %bl
     sall    $8, %ebx
-    orb     $0xFF, %bl
+    andb    $0x00, %bl
     # mov to gdt seg
     movl    %ebx, (%edi)
     

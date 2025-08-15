@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <system.h>
@@ -69,7 +69,7 @@ void term_init() {
     term_y = 0;
     term_color = vga_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 
-    // cls();
+    cls();
 }
 
 void term_putc_at(size_t x, size_t y, uint16_t entry) {
@@ -97,18 +97,25 @@ void term_putchar(char c) {
 }
 
 void term_putstring(const char *string, int len, ...) {
+    va_list args;
+    va_start(args, len);
+
     for (int i = 0; i < len; i++) {
         term_putchar(string[i]);
     }
 }
 
-void term_main() {
-    term_init();
-    char *welcome_string = "Welcome to PatOS\n";
-    int welcome_len = strlen(welcome_string);
-    term_putstring(welcome_string, welcome_len);
+void term_printbytes(const unsigned char *ptr, int num) {
+    unsigned char char_offset;
+    char hex[3];
+    for (int i = 0; i < num; i++) {
+        char_offset = *ptr & 0x0F;
+        hex[0] = '0' + char_offset;
 
-    for (;;) {
-        ;
+        char_offset = (*ptr >> 4) & 0x0F;
+        hex[1] = '0' + char_offset;
+        hex[2] = '\0';
+
+        term_putstring(hex, 2);
     }
 }

@@ -12,7 +12,7 @@ extern void outportb(unsigned short _port, unsigned char _data);
 /* KERNEL.C */
 extern void cls();
 extern void term_putchar(char c);
-extern void term_putstring(const char *string, int len);
+extern void term_putstring(const char *string, int len, ...);
 extern void term_init();
 extern void term_main();
 
@@ -33,4 +33,9 @@ void isrs_install();
 void irq_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
 void irq_uninstall_handler(int irq);
+
+/* CLOCK.C */
+void timer_phase(int hz);
+void timer_install();
+
 #endif

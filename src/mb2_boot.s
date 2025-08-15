@@ -165,6 +165,16 @@ start:
     call    set_tss_descriptor
     popl    %ecx
 
+    #   reset the segment registers
+    ljmp    $0x08, $reload_segments    # Far jump to reload CS
+reload_segments:
+    movw    $0x10, %ax              # Load kernel data segment
+    movw    %ax, %ds
+    movw    %ax, %es
+    movw    %ax, %fs
+    movw    %ax, %gs
+    movw    %ax, %ss
+
     #   debug the null descriptor
     movl    $gdt_desc_message, %esi
     addl    $160, %edi

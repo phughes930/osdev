@@ -34,15 +34,15 @@ stack_bottom:
 .skip 16384         # 16Kb
 stack_top:
 
-.align 2
-gdtr:
-    .word   # should be 0x20
-    .long   # should be an address
+// .align 2
+// gdtr:
+//     .word   # should be 0x20
+//     .long   # should be an address
 
-gdt_bottom:
-.skip 64    # 8 bytes x 2 levels x 2 types + 8 for null + 8 for TSS
-            # + 16 for extra TSS
-gdt_top:
+// gdt_bottom:
+// .skip 48    # 8 bytes x 2 levels x 2 types + 8 for null + 8 for TSS
+//             # + 16 for extra TSS
+// gdt_top:
 
 tss:
 .skip 104
@@ -70,6 +70,69 @@ start:
 
     cli
     cld
+
+    call    gdt_install
+
+//     call    set_gdtr
+//     lgdt    gdtr
+
+//     #   reset the segment registers
+//     ljmp    $0x08, $reload_segments    # Far jump to reload CS
+// reload_segments:
+//     movw    $0x10, %ax              # Load kernel data segment
+//     movw    %ax, %ds
+//     movw    %ax, %es
+//     movw    %ax, %fs
+//     movw    %ax, %gs
+//     movw    %ax, %ss
+
+//     hlt
+//     #   reset stack pointer just in case
+//     movl    $stack_top, %esp
+
+//     #   flags & limit high 4 bits in %al
+//     #   access byte in %dl
+//     #   setting up the gdt
+//     movl    $0, %ecx
+//     call    set_gdt_descr
+
+//     #   set up a kernel code segment
+//     incl    %ecx
+//     movb    $0xCF, %al
+//     movb    $0x9A, %dl
+//     pushl   %ecx
+//     call    set_gdt_descr
+//     popl    %ecx
+
+//     #   set up a kernel data segment
+//     incl    %ecx
+//     movb    $0xCF, %al
+//     movb    $0x92, %dl
+//     pushl   %ecx
+//     call    set_gdt_descr
+//     popl    %ecx
+
+//     #   set up a user code segment
+//     incl    %ecx
+//     movb    $0xCF, %al
+//     movb    $0xFA, %dl
+//     pushl   %ecx
+//     call    set_gdt_descr
+//     popl    %ecx
+
+//     #   set up a user data segment
+//     incl    %ecx
+//     movb    $0xCF, %al
+//     movb    $0xF2, %dl
+//     pushl   %ecx
+//     call    set_gdt_descr
+//     popl    %ecx
+
+//     #   set up a task state segment
+//     incl    %ecx
+//     pushl   %ecx
+//     call    set_tss_descriptor
+//     popl    %ecx
 
     call    cls
 
@@ -99,92 +162,38 @@ start:
     call    print_hex
     subl    $12, %edi
 
-    #   GDT debug
-    call    set_gdtr
 
+    #   GDT debug
     movl    $gdt_message, %esi
     addl    $160, %edi
     call    print_string
-    
     #       GDT size
     xorl    %eax, %eax
-    movw    gdtr, %ax
+    // movw    gdtr, %ax
+    movw    gdtp, %ax
     addl    $12, %edi
     call    print_hex
     subl    $12, %edi
-
     #       GDT loc
-    movl    gdtr+2, %eax
+    // movl    gdtr+2, %eax
+    movl    gdtp+2, %eax
     addl    $34, %edi
     call    print_hex
     subl    $34, %edi
 
-    lgdt    gdtr
-
-    #   flags & limit high 4 bits in %al
-    #   access byte in %dl
-    #   setting up the gdt
-    movl    $0, %ecx
-    call    set_gdt_descr
-
-    #   set up a kernel code segment
-    incl    %ecx
-    movb    $0xCF, %al
-    movb    $0x9A, %dl
-    pushl   %ecx
-    call    set_gdt_descr
-    popl    %ecx
-
-    #   set up a kernel data segment
-    incl    %ecx
-    movb    $0xCF, %al
-    movb    $0x92, %dl
-    pushl   %ecx
-    call    set_gdt_descr
-    popl    %ecx
-
-    #   set up a user code segment
-    incl    %ecx
-    movb    $0xCF, %al
-    movb    $0xFA, %dl
-    pushl   %ecx
-    call    set_gdt_descr
-    popl    %ecx
-
-    #   set up a user data segment
-    incl    %ecx
-    movb    $0xCF, %al
-    movb    $0xF2, %dl
-    pushl   %ecx
-    call    set_gdt_descr
-    popl    %ecx
-
-    #   set up a task state segment
-    incl    %ecx
-    pushl   %ecx
-    call    set_tss_descriptor
-    popl    %ecx
-
-    #   reset the segment registers
-    ljmp    $0x08, $reload_segments    # Far jump to reload CS
-reload_segments:
-    movw    $0x10, %ax              # Load kernel data segment
-    movw    %ax, %ds
-    movw    %ax, %es
-    movw    %ax, %fs
-    movw    %ax, %gs
-    movw    %ax, %ss
 
     #   debug the null descriptor
     movl    $gdt_desc_message, %esi
     addl    $160, %edi
     call    print_string
 
-    movl    gdt_bottom, %eax
+    // movl    gdt_bottom, %eax
+    movl    gdt, %eax
     addl    $18, %edi
     call    print_hex
     addl    $22, %edi
-    movl    gdt_bottom+4, %eax
+    // movl    gdt_bottom+4, %eax
+    movl    gdt+4, %eax
     call    print_hex
     subl    $40, %edi
     
@@ -193,11 +202,13 @@ reload_segments:
     addl    $160, %edi
     call    print_string
 
-    movl    gdt_bottom+8, %eax
+    // movl    gdt_bottom+8, %eax
+    movl    gdt+8, %eax
     addl    $18, %edi
     call    print_hex
     addl    $22, %edi
-    movl    gdt_bottom+12, %eax
+    // movl    gdt_bottom+12, %eax
+    movl    gdt+12, %eax
     call    print_hex
     subl    $40, %edi
     
@@ -206,11 +217,13 @@ reload_segments:
     addl    $160, %edi
     call    print_string
 
-    movl    gdt_bottom+16, %eax
+    // movl    gdt_bottom+16, %eax
+    movl    gdt+16, %eax
     addl    $18, %edi
     call    print_hex
     addl    $22, %edi
-    movl    gdt_bottom+20, %eax
+    // movl    gdt_bottom+20, %eax
+    movl    gdt+20, %eax
     call    print_hex
     
     call    kernel_main
@@ -292,6 +305,21 @@ hex_digit:
     loop    hex_loop
 
     popa
+    ret
+
+.global load_gdt
+.type load_gdt, @function
+.extern gdtp
+load_gdt:
+    lgdt    gdtp
+    ljmp    $0x08, $reload_segments
+reload_segments:
+    movw    $0x10, %ax              # Load kernel data segment
+    movw    %ax, %ds
+    movw    %ax, %es
+    movw    %ax, %fs
+    movw    %ax, %gs
+    movw    %ax, %ss
     ret
 
 .section .rodata

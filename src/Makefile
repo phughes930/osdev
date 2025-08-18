@@ -10,10 +10,10 @@ patos.iso: PatOS.elf
 	cp PatOS.elf iso/boot/
 	grub-mkrescue -o patos.iso iso/
 
-PatOS.elf: linker.ld booter.o kernel.o system.o idt.o isrs.o irqs.o clock.o
+PatOS.elf: linker.ld booter.o kernel.o system.o gdt.o idt.o isrs.o irqs.o clock.o
 	$(CC) -o $@ -T $^ -ffreestanding -nostdlib
 
-booter.o: mb2_boot.s gdt.s isr.s irq.s
+booter.o: mb2_boot.s isr.s irq.s
 	$(AS) -o $@ $^
 
 %.o: %.c $(DEPS)

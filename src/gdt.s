@@ -110,6 +110,7 @@ set_tss_descriptor:
     shll    $8, %edx
     andl    $0x00FFFF00, %edx
     orl     %edx, %ebx
+    orb     %al, %bl
 
     movl    %ebx, (%edi)
 
